@@ -14,4 +14,4 @@ To set up validation using this attributes you have to perform two actions:
 The ValidationAttribute allow you to add your custom validation as needed and not write 
 "if(modelState.isValid() {...}
 else {...})"
-at the beginning of each method.
+in every method.
