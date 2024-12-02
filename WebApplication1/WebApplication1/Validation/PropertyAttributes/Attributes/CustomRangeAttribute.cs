@@ -9,7 +9,7 @@ namespace WebApplication1.Validation.PropertyAttributes.Attributes
     {
         readonly private int MaxValue;
         readonly private int MinValue;
-        private readonly string MessagePattern;
+        private readonly string? MessagePattern;
         public CustomRangeAttribute(int minValue, int maxValue)
         {
             MaxValue = maxValue;
@@ -22,22 +22,22 @@ namespace WebApplication1.Validation.PropertyAttributes.Attributes
             MessagePattern = messagePattern;
         }
 
-        public override CustomValidationResult? Validate(object value, PropertyInfo propertyInfo)
+        public override CustomValidationResult? Validate(object value, PropertyInfo property)
         {
-            int? intValue = (int?)propertyInfo.GetValue(value);
+            int? intValue = (int?)property.GetValue(value);
 
             if (intValue == null)
             {
-                var errorMessage = ((ICustomValidationAttribute)this).FormatMessage(propertyInfo.Name, "Property {0} is null");
-                return new CustomValidationResult(errorMessage, propertyInfo.Name, ValidationErrorStatuses.empty);
+                var errorMessage = ((ICustomValidationAttribute)this).FormatMessage(property.Name, "Property {0} is null");
+                return new CustomValidationResult(errorMessage, property.Name, ValidationErrorStatuses.empty);
             }
 
             if (intValue > MaxValue || intValue < MinValue)
             {
                 var errorMessage = MessagePattern != null
-                            ? ((ICustomValidationAttribute)this).FormatMessage(propertyInfo.Name, MessagePattern)
-                            : ((ICustomValidationAttribute)this).FormatMessage(propertyInfo.Name);
-                return new CustomValidationResult(errorMessage, propertyInfo.Name, ValidationErrorStatuses.outOfRangeValue);
+                            ? ((ICustomValidationAttribute)this).FormatMessage(property.Name, MessagePattern)
+                            : ((ICustomValidationAttribute)this).FormatMessage(property.Name);
+                return new CustomValidationResult(errorMessage, property.Name, ValidationErrorStatuses.outOfRangeValue);
             }
             return null;
         }

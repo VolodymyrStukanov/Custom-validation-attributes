@@ -17,9 +17,9 @@ namespace WebApplication1.Models
         public int? Salary { get; set; }
 
         [CustomRegularExpression(@"^(([a-z0-9]+(.[a-z0-9])+))@([a-z]+)((.([a-z]{2,3}))+)$", "Wrong email format")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [CustomRegularExpression(@"^([0-9]{10})$")]
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
     }
 }

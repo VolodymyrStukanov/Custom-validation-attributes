@@ -5,6 +5,7 @@ using WebApplication1.Validation.Models;
 
 namespace WebApplication1.Validation.ValidationAttributes
 {
+    [AttributeUsage(AttributeTargets.Method)]
     public class ValidationAttribute : Attribute, IActionFilter
     {
         public void OnActionExecuting(ActionExecutingContext context)
@@ -12,19 +13,17 @@ namespace WebApplication1.Validation.ValidationAttributes
             var result = new List<CustomValidationResult>();
             foreach (var argument in context.ActionArguments)
             {
-                var properties = argument.Value.GetType().GetProperties();
-                foreach (var property in properties)
+                var properties = argument.Value?.GetType().GetProperties();
+                if(properties != null)
                 {
-                    var attributes = property.GetCustomAttributes()
-                        .Where(x => typeof(ICustomValidationAttribute)
-                        .IsAssignableFrom(x.GetType()))
-                        .Select(x => (ICustomValidationAttribute)x)
-                        .ToList();
-                    if (attributes != null)
+                    foreach (var property in properties)
                     {
+                        var attributes = property.GetCustomAttributes()
+                            .OfType<ICustomValidationAttribute>()
+                            .ToList();
                         attributes.ForEach(attribute =>
                         {
-                            var validationResult = attribute.Validate(argument.Value, property);
+                            var validationResult = attribute.Validate(argument.Value!, property);
                             if (validationResult != null)
                             {
                                 validationResult.FieldName = argument.Key + "." + validationResult.FieldName;
@@ -32,7 +31,7 @@ namespace WebApplication1.Validation.ValidationAttributes
                             }
                         });
                     }
-                };
+                }                
             }
             if (result.Count != 0)
             {

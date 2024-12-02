@@ -8,7 +8,7 @@ namespace WebApplication1.Validation.PropertyAttributes.Attributes
     public class CustomMaxLengthAttribute : AbstractPropertyAttribute
     {
         private readonly int Length;
-        private readonly string MessagePattern;
+        private readonly string? MessagePattern;
         public CustomMaxLengthAttribute(int length)
         {
             Length = length;
@@ -19,25 +19,22 @@ namespace WebApplication1.Validation.PropertyAttributes.Attributes
             MessagePattern = messagePattern;
         }
 
-        public override CustomValidationResult? Validate(object value, PropertyInfo propertyInfo)
+        public override CustomValidationResult? Validate(object value, PropertyInfo property)
         {
-            var valueString = (string)propertyInfo.GetValue(value);
+            var valueString = (string?)property.GetValue(value);
 
             if (valueString == null)
             {
-                var errorMessage = ((ICustomValidationAttribute)this).FormatMessage(propertyInfo.Name, "Property {0} is null");
-                return new CustomValidationResult(errorMessage, propertyInfo.Name, ValidationErrorStatuses.empty);
+                var errorMessage = ((ICustomValidationAttribute)this).FormatMessage(property.Name, "Property {0} is null");
+                return new CustomValidationResult(errorMessage, property.Name, ValidationErrorStatuses.empty);
             }
 
-            if (value != null)
+            if (value != null && valueString.Length > Length)
             {
-                if (valueString.Length > Length)
-                {
-                    var errorMessage = MessagePattern != null
-                            ? ((ICustomValidationAttribute)this).FormatMessage(propertyInfo.Name, MessagePattern)
-                            : ((ICustomValidationAttribute)this).FormatMessage(propertyInfo.Name);
-                    return new CustomValidationResult(errorMessage, propertyInfo.Name, ValidationErrorStatuses.outOfLength);
-                }
+                var errorMessage = MessagePattern != null
+                        ? ((ICustomValidationAttribute)this).FormatMessage(property.Name, MessagePattern)
+                        : ((ICustomValidationAttribute)this).FormatMessage(property.Name);
+                return new CustomValidationResult(errorMessage, property.Name, ValidationErrorStatuses.outOfLength);
             }
             return null;
         }
